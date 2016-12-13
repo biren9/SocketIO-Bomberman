@@ -2,6 +2,7 @@
 var http = require('http');
 var io = require('socket.io');
 var port = 5000;
+var _ = require('lodash');
 
 // Start the server at port 8080
 var server = http.createServer(function(request, response){
@@ -82,7 +83,7 @@ socket.on('connection', function(client){
                   let bombField = new Array();
                   map[nY][nX] = 4; //Replace bombe with an explosion
                   bombField.push({X: nX, Y: nY}); //generate an array with the coordinates
-                  for (var i = 1; i <= pl.force; i++) {
+                  for (let i = 1; i <= pl.force; i++) {
                     if(up && nY-i >= 0 && map[nY-i][nX] !== 1) {
                       if(map[nY-i][nX] === 2) up = false;
                       map[nY-i][nX] = 4;
@@ -109,7 +110,7 @@ socket.on('connection', function(client){
                     for(let b in bombField) {
                       map[bombField[b].Y][bombField[b].X] = 0;
                       for(let p in players) {
-                        if(JSON.stringify({X: players[p].X, Y:players[p].Y}) === JSON.stringify(bombField[b])) {
+                        if(_.isEqual({X: players[p].X, Y:players[p].Y}, bombField[b] )) {
                           socket.to(players[p].id).emit('message', 'Dead');
                           createClient(players[p]);//Recalculate new coordinates
                           //Check if player has not disconnected & update states
@@ -132,7 +133,7 @@ socket.on('connection', function(client){
     });
 
     client.on('disconnect',function(){
-        console.log('Server has disconnected');
+        console.log('Client has disconnected');
         delete players[client.id];
         socket.send({map: map, players: players});
     });

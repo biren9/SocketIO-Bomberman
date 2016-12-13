@@ -11,6 +11,7 @@
   "license": "ISC",
   "dependencies": {
     "express": "^4.14.0",
+    "lodash": "^4.17.2",
     "socket.io": "^1.7.1"
   }
 }
