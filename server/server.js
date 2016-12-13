@@ -3,7 +3,7 @@ var http = require('http');
 var io = require('socket.io');
 var port = 5000;
 var _ = require('lodash');
-
+var maxPlayers = 60;
 // Start the server at port 8080
 var server = http.createServer(function(request, response){
     // Send HTML headers and message
@@ -35,6 +35,11 @@ let randX;
 let randY;
 // Add a connect listener
 socket.on('connection', function(client){
+    if(_.size(players) > maxPlayers) {
+      client.send({status: "full"});
+      client.disconnect();
+      return;
+    }
     console.log('Connection to client established ');
     var createClient = function(c) {
       var c = c || client;
@@ -55,7 +60,7 @@ socket.on('connection', function(client){
     createClient();
 
     // Success!  Now listen to messages to be received
-    client.on('message',function(event) {
+    client.on('message', function(event) {
         if(players[client.id] === undefined) return;//if player has disconnected
         if(Math.abs(event.X) <= 1 && Math.abs(event.Y) <= 1) { // no more than 1 step at a time
 
