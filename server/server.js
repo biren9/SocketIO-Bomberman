@@ -36,43 +36,53 @@ let randY;
 socket.on('connection', function(client){
     console.log('Connection to client established ');
     var createClient = function(c) {
-      var c = c || client; var count = 0;
-      var freePlace = new Array();
+      var c = c || client;
 
+      //Generate an array with free spots to spawn
+      var freePlace = new Array();
       for (var i = 0; i < map.length; i++) {
         for (var j = 0; j < map[i].length; j++) {
           if(map[i][j] === 0) freePlace.push({X: j, Y: i});
         }
       }
-      let rand = Math.floor(Math.random() * freePlace.length);
 
+      //Select a random place on the map
+      let rand = Math.floor(Math.random() * freePlace.length);
       players[c.id] = {id: c.id, X: freePlace[rand].X, Y: freePlace[rand].Y, force: 3, explodeSpeed: 2000, kills: 0};
       socket.send({map: map, players: players});
     };
     createClient();
+
     // Success!  Now listen to messages to be received
     client.on('message',function(event) {
-        if(players[client.id] === undefined) return;
-        if(Math.abs(event.X) <= 1 && Math.abs(event.Y) <= 1) { // no more than 1 step at ones
+        if(players[client.id] === undefined) return;//if player has disconnected
+        if(Math.abs(event.X) <= 1 && Math.abs(event.Y) <= 1) { // no more than 1 step at a time
+
+          //calc new position & save some values
           let nX = parseInt(players[client.id].X + event.X);
           let nY = parseInt(players[client.id].Y + event.Y);
-          let playerForce = players[client.id].force;
+          let pl = {};
+              pl.force = players[client.id].force;
+              pl.explodeSpeed = players[client.id].explodeSpeed;
+
           if(nX >= 0 && nX < map[0].length && nY >= 0 && nY < mapSizeY ) { // prevent exit map
             if(map[nY][nX] !== undefined && map[nY][nX] === 0) {// prevent enter wall
               console.log({X: nX, Y: nY});
+
+              //Set new position
               players[client.id].X = nX;
               players[client.id].Y = nY;
-              if(event.B === 1) {
-                map[nY][nX] = 3;
-                setTimeout(function () {
+              if(event.B === 1) { //event.B = Bombe
+                map[nY][nX] = 3;// place bomb on map
+                setTimeout(function () {//Wait until explodeSpeed from client
                   let up=true;
                   let down=true;
                   let left=true;
                   let right=true;
                   let bombField = new Array();
-                  map[nY][nX] = 4;
-                  bombField.push({X: nX, Y: nY});
-                  for (var i = 1; i <= playerForce; i++) {
+                  map[nY][nX] = 4; //Replace bombe with an explosion
+                  bombField.push({X: nX, Y: nY}); //generate an array with the coordinates
+                  for (var i = 1; i <= pl.force; i++) {
                     if(up && nY-i >= 0 && map[nY-i][nX] !== 1) {
                       if(map[nY-i][nX] === 2) up = false;
                       map[nY-i][nX] = 4;
@@ -94,24 +104,25 @@ socket.on('connection', function(client){
                       bombField.push({X: nX+i, Y: nY});
                     } else right = false;
                   }
-                  socket.send({map: map, players: players});
+                  socket.send({map: map, players: players});//Send to all clients
                   setTimeout(function () {
                     for(let b in bombField) {
                       map[bombField[b].Y][bombField[b].X] = 0;
                       for(let p in players) {
                         if(JSON.stringify({X: players[p].X, Y:players[p].Y}) === JSON.stringify(bombField[b])) {
                           socket.to(players[p].id).emit('message', 'Dead');
-                          createClient(players[p]);
+                          createClient(players[p]);//Recalculate new coordinates
+                          //Check if player has not disconnected & update states
                           if(players[client.id] !== undefined) players[client.id].kills += 1;
                           if(players[p] !== undefined) players[p].kills = 0;
                         }
-                      }
-                    }
+                      }//for let p in players
+                    }//for let b in bombField
                     socket.send({map: map, players: players});
-                  }, 200);
-                }, players[client.id].explodeSpeed);
+                  }, 200);//wait 200ms -> explode img
+                }, pl.explodeSpeed); // --> time until bombe explodes
               }
-              else if(event.W === 1) {
+              else if(event.W === 1) {//Prevent placing blocks -> top left corner
                 if(nY > 1 || nX > 1) map[nY][nX] = 2;
               }
             }
