@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta name="viewport" content="width=device-width, user-scalable=no" />
+    <style media="screen">
+      body {
+        margin: 0;
+        overflow: hidden;
+        background-color: steelblue;
+      }
+      #canvas {
+        margin: auto;
+      }
+      .status {
+        position: absolute;
+        top: 0px;
+        right: 0px;
+        width: 100px;
+      }
+      .wasd {
+        background-color: red;
+      }
+      .tool {
+        background-color: black;
+      }
+      .onscreenButton {
+        position: absolute;
+        opacity: .5;
+        font-size: 30px;
+        width: 60px;
+        height: 60px;
+        text-align: center;
+        color: white;
+        padding: 7px;
+      }
+      .bg-text::after {
+        content: attr(id);
+      }
+    </style>
+    <script src="http://localhost:5000/socket.io/socket.io.js"></script>
+    <script src="lib.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+    <script canvas="canvas">
+
+
+        $(document).ready(function() {
+
+          var socket = new io.connect('http://localhost:5000');
+          var floor = new Image();
+              floor.src = "textures/floor.jpg";
+          var wall = new Image();
+              wall.src = "textures/wall.jpg";
+          var player = new Image();
+              player.src = "textures/player.png";
+          var wood = new Image();
+              wood.src = "textures/wood.jpg";
+          var bomb = new Image();
+              bomb.src = "textures/bomb.png";
+          var explode = new Image();
+              explode.src = "textures/explode.gif";
+
+          var c = document.getElementById("canvas");
+          c.width = window.innerWidth;
+          c.height = window.innerHeight;
+          var ctx = c.getContext("2d");
+          var _fw = 50; // Feldgröße Breite
+          var _fh = 50; // Feldgröße Höhe
+          var _p; // Playergröße
+
+          if (/Android|webOS|iPhone|iPad|iPod|BlackBerry|BB|PlayBook|IEMobile|Windows Phone|Kindle|Silk|Opera Mini/i.test(navigator.userAgent)) {
+            console.log("Mobile Device!");
+            $("body").append('<div class="wasd bg-text onscreenButton" id="W"></div>')
+            $("#W").css({bottom: "100px", left: "100px"});
+            $("#W").on('click touch', function() {
+              $(this).trigger({type: 'keypress', which: 119, keyCode: 119});
+            });
+
+            $("body").append('<div class="wasd bg-text onscreenButton" id="A"></div>');
+            $("#A").css({bottom: "10px", left: "10px"});
+            $("#A").on('click touch', function() {
+              $(this).trigger({type: 'keypress', which: 97, keyCode: 97});
+            });
+
+            $("body").append('<div class="wasd bg-text onscreenButton" id="S"></div>');
+            $("#S").css({bottom: "10px", left: "100px"});
+            $("#S").on('click touch', function() {
+              $(this).trigger({type: 'keypress', which: 115, keyCode: 115});
+            });
+
+            $("body").append('<div class="wasd bg-text onscreenButton" id="D"></div>');
+            $("#D").css({bottom: "10px", left: "190px"});
+            $("#D").on('click touch', function() {
+              $(this).trigger({type: 'keypress', which: 100, keyCode: 100});
+            });
+
+            $("body").append('<div class="tool bg-text onscreenButton" id="B"></div>');
+            $("#B").css({bottom: "100px", left: "10px"});
+            $("#B").on('click touch', function() {
+              $(this).trigger({type: 'keypress', which: 98, keyCode: 98});
+            });
+
+            $("body").append('<div class="tool bg-text onscreenButton" id="V"></div>');
+            $("#V").css({bottom: "100px", left: "190px"});
+            $("#V").on('click touch', function() {
+              $(this).trigger({type: 'keypress', which: 118, keyCode: 118});
+            });
+          }
+
+          // Add a connect listener
+          socket.on('connect',function() {
+            console.log('Client has connected to the server!');
+          });
+          // Add a connect listener
+          socket.on('message',function(data) {
+            console.log('Received a message from the server!',data);
+            if(data.map) {
+              _fw = c.width / data.map[0].length;
+              _fh = c.height / data.map.length;
+              _fw = Math.min(_fw, _fh);
+              _fh = _fw;
+              _pw = _fw/2;
+              _ph = _fh/2;
+
+              $("#onlineCount").html(_.size(data.players));
+              $.each(data.players, function(key, value) {
+                if(value.id === socket.io.engine.id) $("#kills").html(value.kills);
+              });
+              drawMap(data.map, data.players);
+            }
+          });
+          // Add a disconnect listener
+          socket.on('disconnect',function() {
+            console.log('The client has disconnected!');
+          });
+
+          // Sends a message to the server via sockets
+          function sendMessageToServer(message) {
+            socket.send(message);
+          };
+
+
+          function drawMap(map, players) {
+            clear();
+            $.each(map, function(outKey, outValue) {
+              $.each(outValue, function(inKey, inValue) {
+                let a = floor;
+                ctx.drawImage(floor, inKey*_fw, outKey*_fh, _fw, _fh);
+
+                if(inValue === 1) {
+                  a = wall;
+                }
+                else if(inValue === 2) {
+                  a = wood;
+                }
+                else if(inValue === 3) {
+                  a = bomb;
+                }
+                else if(inValue === 4) {
+                  a = explode;
+                }
+                ctx.drawImage(a, inKey*_fw, outKey*_fh, _fw, _fh);
+                $.each(players, function(k, v) {
+                  if(v.X === inKey && v.Y === outKey) {
+                    ctx.drawImage(player, inKey*_fw+_pw/2, outKey*_fh+_ph/2, _pw, _ph);
+                  }
+                });
+              });
+            });
+          }// draw Map
+
+          function clear() {
+            canvas.width = canvas.width;
+          }
+
+          $("body").keypress(function(e) {
+            let X=Y=B=W=0;
+            switch(e.keyCode) {
+              case 119://w
+                Y = -1;
+                break;
+              case 100://d
+                X = 1;
+                break;
+              case 115://s
+                Y = 1;
+                break;
+              case 97://a
+                X = -1;
+                break;
+              case 98://b
+                B = 1;
+                break;
+              case 118://v
+                W = 1;
+                break;
+              default:
+                return;
+            }
+            sendMessageToServer({X: X, Y: Y, B: B, W:W});
+          });
+        });
+
+    </script>
+
+    <meta charset="utf-8">
+    <title></title>
+  </head>
+  <body>
+    <canvas id="canvas" width="100%" height="100%"></canvas>
+    <div class="status">
+      <b>Online: <span id="onlineCount"></span></b>/20 <br />
+      <b>Kills: <span id="kills">0</span></b> <br />
+      <b>W</b> Up <br />
+      <b>A</b> Left <br />
+      <b>S</b> Down <br />
+      <b>D</b> Right <br />
+      <b>B</b> Bombe <br />
+      <b>V</b> Block <br />
+    </div>
+  </body>
+</html>
