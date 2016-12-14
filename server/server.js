@@ -1,16 +1,21 @@
 // Require HTTP module (to start server) and Socket.IO
-var http = require('http');
-var io = require('socket.io');
-var port = 5000;
-var _ = require('lodash');
-var maxPlayers = 60;
+const path = require('path');
+const express = require('express');
+const http = require('http');
+const io = require('socket.io');
+const port = 5000;
+const _ = require('lodash');
+const maxPlayers = 60;
 // Start the server at port 8080
-var server = http.createServer(function(request, response){
-    // Send HTML headers and message
-    response.writeHead(200,{ 'Content-Type': 'text/html' });
-    response.end();
-});
 
+var app = express();
+const publicDir = path.join(__dirname, '../client');
+
+app.use(express.static(publicDir));
+console.log(publicDir);
+
+// Start the server at port 8080
+var server = http.createServer(app);
 server.listen(port);
 
 // Create a Socket.IO instance, passing it our server
