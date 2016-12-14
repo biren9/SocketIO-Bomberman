@@ -37,7 +37,7 @@
         content: attr(id);
       }
     </style>
-    <script src="http://localhost:5000/socket.io/socket.io.js"></script>
+    <script src="http://localhost:8080/socket.io/socket.io.js"></script>
     <script src="lodash.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script canvas="canvas">
@@ -45,7 +45,7 @@
 
         $(document).ready(function() {
 
-          var socket = new io.connect('http://localhost:5000');
+          var socket = new io.connect('http://localhost:8080');
           var floor = new Image();
               floor.src = "textures/floor.jpg";
           var wall = new Image();
