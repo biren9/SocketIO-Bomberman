@@ -3,10 +3,10 @@ const path = require('path');
 const express = require('express');
 const http = require('http');
 const io = require('socket.io');
-const port = 5000;
+const port = 8080;
 const _ = require('lodash');
 const maxPlayers = 60;
-// Start the server at port 8080
+
 
 var app = express();
 const publicDir = path.join(__dirname, '../client');
@@ -14,9 +14,8 @@ const publicDir = path.join(__dirname, '../client');
 app.use(express.static(publicDir));
 console.log(publicDir);
 
-// Start the server at port 8080
 var server = http.createServer(app);
-server.listen(port);
+server.listen(port);// Start the server at const port
 
 // Create a Socket.IO instance, passing it our server
 var socket = io.listen(server);
