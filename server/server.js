@@ -39,7 +39,7 @@ let randX;
 let randY;
 // Add a connect listener
 socket.on('connection', function(client){
-    if(_.size(players) > maxPlayers) {
+    if(_.size(players) >= maxPlayers) {
       client.send({status: "full"});
       client.disconnect();
       return;

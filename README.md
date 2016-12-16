@@ -9,4 +9,4 @@ _Run cli:_ **node server.js**
 _Open_ **http://localhost:8080/client.html** _in a webbrowser_
 
 #### Demo ####
-[Demo link](http://biren.eu:8080/client.html)
+[Demo link](http://biren.eu:8080)
