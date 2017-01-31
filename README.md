@@ -15,4 +15,4 @@ _coming soon_
 1. Add server clock to synchronise calculations
 2. Synchronise explosions
 3. Limit requests
-4. As always, **IMPROVEMENTS**
+4. As always, **IMPROVEMENTS** :-)
