@@ -115,11 +115,6 @@ var renderMap = {
 
             if (nX >= 0 && nX < self.map[0].length && nY >= 0 && nY < self.map.length) { // prevent exit map
                 if (self.map[nY][nX] !== undefined && self.map[nY][nX] === 0) { // prevent enter not empty spots
-                    /*debug*/
-                    console.log({
-                        X: nX,
-                        Y: nY
-                    });
 
                     //Set new position
                     self.players[client.id].X = nX;
@@ -150,7 +145,6 @@ var renderMap = {
       var b = self.players[client.id].bombs;
 
       for (var i = 0; i < b.length; i++) {
-          console.log(b[i]);
 
           if (b[i].explodeTime >= Date.now()) { //Bomb on field
               if (!b[i].isPlaced) {
@@ -216,7 +210,7 @@ var renderMap = {
           } else {
               self.map[b[i].Y][b[i].X] = 0; // Remove explosion
               for (let bf in b[i].bombField) {
-                  console.log(b[i].bombField[bf].Y);
+
                   self.map[b[i].bombField[bf].Y][b[i].bombField[bf].X] = 0;
                   for (let p in self.players) {
 
