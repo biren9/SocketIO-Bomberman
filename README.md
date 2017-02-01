@@ -11,8 +11,11 @@ _Open_ **http://localhost:8080** _in a webbrowser_
 ### Demo ###
 _coming soon_
 
+### Updates ###
+ + Add a server clock to synchronise calculations
+ + Synchronise explosions
+
 ### TODO ###
-1. Add server clock to synchronise calculations
-2. Synchronise explosions
-3. Limit requests
-4. As always, **IMPROVEMENTS** :-)
+1. Now I have to test **everything** again
+2. Limit requests
+3. As always, **IMPROVEMENTS** :-)
