@@ -133,6 +133,7 @@
               $.each(data.players, function(key, value) {
                 if(value.id === socket.io.engine.id) $("#kills").html(value.kills);
               });
+
               drawMap(data.map, data.players);
             }
           });
@@ -170,6 +171,8 @@
                 $.each(players, function(k, v) {
                   if(v.X === inKey && v.Y === outKey) {
                     ctx.drawImage(player, inKey*_fw+_pw/2, outKey*_fh+_ph/2, _pw, _ph);
+                    /*ctx.fillText(v.id, inKey*_fw+_pw/2+50, outKey*_fh+_ph/2);
+                    ctx.font = "bold 16px Arial";*/
                   }
                 });
               });
