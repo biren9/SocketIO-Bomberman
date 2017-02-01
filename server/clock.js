@@ -27,7 +27,7 @@ module.exports = {
         if (this.timer !== null) return; // prevent starting timer multiple times
         var self = this; // reference for this
 
-        timer = setInterval(function() {
+        this.timer = setInterval(function() {
             var element;
 
             //Render Map for every action in Queue
