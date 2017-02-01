@@ -36,14 +36,15 @@ module.exports = {
             };
 
             //Render Map for every Bomb
-            for(var p in self.players) {
-              renderMap.bomeInteraction(self.players[p], self);
+            for (var p in self.players) {
+                renderMap.bomeInteraction(self.players[p], self);
             }
 
             var pl = [];
 
             //Create an return array with every connected player
             for (p in self.players) {
+                //console.log(self.players[p].id);
                 if (self.players[p].isConnected) {
                     pl.push({
                         id: self.players[p].id,
@@ -52,9 +53,11 @@ module.exports = {
                         Y: self.players[p].Y
                     });
                 } // Delete player who is disconnected
-                else self.players.splice(self.players[p].id, 1);
+                else {
+                    console.log("Client disconnected " + self.players[p].id);
+                    self.players.splice(self.players[p].id, 1);
+                }
             }
-
             //Return Object with new map
             self.socket.send({
                 map: self.map,
@@ -100,6 +103,14 @@ module.exports = {
             kills: 0,
             isConnected: true
         }; // default 0 kills
+    },
+
+
+
+    scheudleDisconnect: function(c) {
+        c.isConnected = false;
+        c.X = -1;
+        c.Y = -1;
     }
 };
 
@@ -137,99 +148,99 @@ var renderMap = {
                         if (nY > 1 || nX > 1) self.map[nY][nX] = 2; // Guaranteed find a spawn spot
                     }
 
-                  }
+                }
             }
         }
     },
     bomeInteraction: function(client, self) {
-      var b = self.players[client.id].bombs;
+        var b = self.players[client.id].bombs;
 
-      for (var i = 0; i < b.length; i++) {
+        for (var i = 0; i < b.length; i++) {
 
-          if (b[i].explodeTime >= Date.now()) { //Bomb on field
-              if (!b[i].isPlaced) {
-                  b[i].isPlaced = true; // Set placed on map to true
-                  self.map[b[i].Y][b[i].X] = 3; // place bomb on map
-              }
-          } else if ((b[i].explodeTime + b[i].explosionDuration) >= Date.now()) { //Explosion
-              if(!b[i].isExplode) {
-                b[i].isExplode = true;
-                self.map[b[i].Y][b[i].X] = 4; //Replace bomb with an explosion
-
-                //Add Bomb location to explode radius
-                b[i].bombField.push({
-                    X: b[i].X,
-                    Y: b[i].Y,
-                    id: client.id
-                });
-
-                let up = true;
-                let down = true;
-                let left = true;
-                let right = true;
-
-                for (let j = 1; j <= b[i].force; j++) {
-                    if (up && b[i].Y - j >= 0 && self.map[b[i].Y - j][b[i].X] !== 1) {
-                        if (self.map[b[i].Y - j][b[i].X] === 2) up = false;
-                        self.map[b[i].Y - j][b[i].X] = 4;
-                        b[i].bombField.push({
-                            X: b[i].X,
-                            Y: b[i].Y - j,
-                            id: client.id
-                        });
-                    } else up = false;
-                    if (down && b[i].Y + j < self.map.length && self.map[b[i].Y + j][b[i].X] !== 1) {
-                        if (self.map[b[i].Y + j][b[i].X] === 2) down = false;
-                        self.map[b[i].Y + j][b[i].X] = 4;
-                        b[i].bombField.push({
-                            X: b[i].X,
-                            Y: b[i].Y + j,
-                            id: client.id
-                        });
-                    } else down = false;
-                    if (left && b[i].X - j >= 0 && self.map[b[i].Y][b[i].X - j] !== 1) {
-                        if (self.map[b[i].Y][b[i].X - 1] === 2) left = false;
-                        self.map[b[i].Y][b[i].X - j] = 4;
-                        b[i].bombField.push({
-                            X: b[i].X - j,
-                            Y: b[i].Y,
-                            id: client.id
-                        });
-                    } else left = false;
-                    if (right && b[i].X + j < self.map[0].length && self.map[b[i].Y][b[i].X + j] !== 1) {
-                        if (self.map[b[i].Y][b[i].X + j] === 2) right = false;
-                        self.map[b[i].Y][b[i].X + j] = 4;
-                        b[i].bombField.push({
-                            X: b[i].X + j,
-                            Y: b[i].Y,
-                            id: client.id
-                        });
-                    } else right = false;
+            if (b[i].explodeTime >= Date.now()) { //Bomb on field
+                if (!b[i].isPlaced) {
+                    b[i].isPlaced = true; // Set placed on map to true
+                    self.map[b[i].Y][b[i].X] = 3; // place bomb on map
                 }
-              }
-          } else {
-              self.map[b[i].Y][b[i].X] = 0; // Remove explosion
-              for (let bf in b[i].bombField) {
+            } else if ((b[i].explodeTime + b[i].explosionDuration) >= Date.now()) { //Explosion
+                if (!b[i].isExplode) {
+                    b[i].isExplode = true;
+                    self.map[b[i].Y][b[i].X] = 4; //Replace bomb with an explosion
 
-                  self.map[b[i].bombField[bf].Y][b[i].bombField[bf].X] = 0;
-                  for (let p in self.players) {
+                    //Add Bomb location to explode radius
+                    b[i].bombField.push({
+                        X: b[i].X,
+                        Y: b[i].Y,
+                        id: client.id
+                    });
 
-                      //Compare players and explosion position
-                      if (_.isEqual({
-                              X: self.players[p].X,
-                              Y: self.players[p].Y
-                          }, {
-                            X: b[i].bombField[bf].X,
-                            Y: b[i].bombField[bf].Y
-                          })) {
-                          //Execute when position are equale
-                          self.players[b[i].bombField[bf].id].kills += 1; // append a kill to the bomb owner
-                          self.addClient(self.players[p], self.players[p].bombs); //Recalculate new coordinates
-                      }
-                  } //for let p in players
-              } //for let bf in bombField
-              self.players[client.id].bombs.splice(i, 1);
-          }
-      }
+                    let up = true;
+                    let down = true;
+                    let left = true;
+                    let right = true;
+
+                    for (let j = 1; j <= b[i].force; j++) {
+                        if (up && b[i].Y - j >= 0 && self.map[b[i].Y - j][b[i].X] !== 1) {
+                            if (self.map[b[i].Y - j][b[i].X] === 2) up = false;
+                            self.map[b[i].Y - j][b[i].X] = 4;
+                            b[i].bombField.push({
+                                X: b[i].X,
+                                Y: b[i].Y - j,
+                                id: client.id
+                            });
+                        } else up = false;
+                        if (down && b[i].Y + j < self.map.length && self.map[b[i].Y + j][b[i].X] !== 1) {
+                            if (self.map[b[i].Y + j][b[i].X] === 2) down = false;
+                            self.map[b[i].Y + j][b[i].X] = 4;
+                            b[i].bombField.push({
+                                X: b[i].X,
+                                Y: b[i].Y + j,
+                                id: client.id
+                            });
+                        } else down = false;
+                        if (left && b[i].X - j >= 0 && self.map[b[i].Y][b[i].X - j] !== 1) {
+                            if (self.map[b[i].Y][b[i].X - 1] === 2) left = false;
+                            self.map[b[i].Y][b[i].X - j] = 4;
+                            b[i].bombField.push({
+                                X: b[i].X - j,
+                                Y: b[i].Y,
+                                id: client.id
+                            });
+                        } else left = false;
+                        if (right && b[i].X + j < self.map[0].length && self.map[b[i].Y][b[i].X + j] !== 1) {
+                            if (self.map[b[i].Y][b[i].X + j] === 2) right = false;
+                            self.map[b[i].Y][b[i].X + j] = 4;
+                            b[i].bombField.push({
+                                X: b[i].X + j,
+                                Y: b[i].Y,
+                                id: client.id
+                            });
+                        } else right = false;
+                    }
+                }
+            } else {
+                self.map[b[i].Y][b[i].X] = 0; // Remove explosion
+                for (let bf in b[i].bombField) {
+
+                    self.map[b[i].bombField[bf].Y][b[i].bombField[bf].X] = 0;
+                    for (let p in self.players) {
+
+                        //Compare players and explosion position
+                        if (_.isEqual({
+                                X: self.players[p].X,
+                                Y: self.players[p].Y
+                            }, {
+                                X: b[i].bombField[bf].X,
+                                Y: b[i].bombField[bf].Y
+                            })) {
+                            //Execute when position are equale
+                            self.players[b[i].bombField[bf].id].kills += 1; // append a kill to the bomb owner
+                            self.addClient(self.players[p], self.players[p].bombs); //Recalculate new coordinates
+                        }
+                    } //for let p in players
+                } //for let bf in bombField
+                self.players[client.id].bombs.splice(i, 1);
+            }
+        }
     }
 };

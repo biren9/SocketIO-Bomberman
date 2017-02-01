@@ -16,7 +16,7 @@ app.use(express.static(publicDir));
 console.log(publicDir);
 
 var server = http.createServer(app);
-server.listen(port);// Start the server at const port
+server.listen(port); // Start the server at const port
 
 // Create a Socket.IO instance, passing it our server
 var socket = io.listen(server);
@@ -27,23 +27,28 @@ gameClock.speed = 50; // default = 100
 gameClock.start();
 
 // Add a connect listener
-socket.on('connection', function(client){
-    if(_.size(gameClock.players) >= maxPlayers) {
-      client.send({status: "full"});
-      client.disconnect();
-      return;
+socket.on('connection', function(client) {
+    if (_.size(gameClock.players) >= maxPlayers) {
+        client.send({
+            status: "full"
+        });
+        client.disconnect();
+        return;
     }
     console.log('Connection to client established ');
     gameClock.addClient(client);
 
     // Now listen to messages to be received
     client.on('message', function(event) {
-        gameClock.queue.push({event: event, client: client});// add request to queue
+        gameClock.queue.push({
+            event: event,
+            client: client
+        }); // add request to queue
     });
 
-    client.on('disconnect',function(){
+    client.on('disconnect', function() {
         console.log('Client ready for disconnect');
-        gameClock.players[client.id].isConnected = false; // Player ready for disconnect
+        gameClock.scheudleDisconnect(gameClock.players[client.id]); // Player ready for disconnect
     });
 });
 
