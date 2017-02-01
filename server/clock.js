@@ -162,6 +162,13 @@ var renderMap = {
                 b[i].isExplode = true;
                 self.map[b[i].Y][b[i].X] = 4; //Replace bomb with an explosion
 
+                //Add Bomb location to explode radius
+                b[i].bombField.push({
+                    X: b[i].X,
+                    Y: b[i].Y,
+                    id: client.id
+                });
+
                 let up = true;
                 let down = true;
                 let left = true;
