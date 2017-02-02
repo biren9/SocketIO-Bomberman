@@ -102,7 +102,7 @@ module.exports = {
             Y: freePlace[rand].Y, //spot on map
             bombs: bombLeftOnField, //Bombs on field
             force: 3, //Bomb power
-            explodeSpeed: 2000, //time until explosion
+            explodeSpeed: 5000, //time until explosion
             explosionDuration: 200, //explosion duration
             limitBomb: 2, // Bomb limit user
             kills: 0, // default 0 kills
@@ -161,6 +161,17 @@ var renderMap = {
         }
     },
     bomeInteraction: function(client, self) {
+        var explodeTo = function(X, Y) {
+          let p, b;
+          for(p in self.players) {
+            for(b in self.players[p].bombs) {
+              if(self.players[p].bombs[b].X === X && self.players[p].bombs[b].Y === Y) {
+                self.players[p].bombs[b].explodeTime = Date.now();
+              }
+            }
+          }
+        };
+
         var b = self.players[client.id].bombs; // shortcut for bomb array
 
         for (var i = 0; i < b.length; i++) {
@@ -190,6 +201,7 @@ var renderMap = {
                     for (let j = 1; j <= b[i].force; j++) {
                         if (up && b[i].Y - j >= 0 && self.map[b[i].Y - j][b[i].X] !== 1) {
                             if (self.map[b[i].Y - j][b[i].X] === 2) up = false;
+                            if (self.map[b[i].Y - j][b[i].X] === 3) explodeTo(b[i].X, b[i].Y - j);
                             self.map[b[i].Y - j][b[i].X] = 4;
                             b[i].bombField.push({
                                 X: b[i].X,
@@ -199,6 +211,7 @@ var renderMap = {
                         } else up = false;
                         if (down && b[i].Y + j < self.map.length && self.map[b[i].Y + j][b[i].X] !== 1) {
                             if (self.map[b[i].Y + j][b[i].X] === 2) down = false;
+                            if (self.map[b[i].Y + j][b[i].X] === 3) explodeTo(b[i].X, b[i].Y + j);
                             self.map[b[i].Y + j][b[i].X] = 4;
                             b[i].bombField.push({
                                 X: b[i].X,
@@ -207,7 +220,8 @@ var renderMap = {
                             });
                         } else down = false;
                         if (left && b[i].X - j >= 0 && self.map[b[i].Y][b[i].X - j] !== 1) {
-                            if (self.map[b[i].Y][b[i].X - 1] === 2) left = false;
+                            if (self.map[b[i].Y][b[i].X - j] === 2) left = false;
+                            if (self.map[b[i].Y][b[i].X - j] === 3) explodeTo(b[i].X - j, b[i].Y);
                             self.map[b[i].Y][b[i].X - j] = 4;
                             b[i].bombField.push({
                                 X: b[i].X - j,
@@ -217,6 +231,7 @@ var renderMap = {
                         } else left = false;
                         if (right && b[i].X + j < self.map[0].length && self.map[b[i].Y][b[i].X + j] !== 1) {
                             if (self.map[b[i].Y][b[i].X + j] === 2) right = false;
+                            if (self.map[b[i].Y][b[i].X + j] === 3) explodeTo(b[i].X + j, b[i].Y);
                             self.map[b[i].Y][b[i].X + j] = 4;
                             b[i].bombField.push({
                                 X: b[i].X + j,
