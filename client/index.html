@@ -65,6 +65,7 @@
           c.width = window.innerWidth;
           c.height = window.innerHeight;
           var ctx = c.getContext("2d");
+
           var _fw = 50; // Feldgröße Breite
           var _fh = 50; // Feldgröße Höhe
           var _p; // Playergröße
@@ -149,6 +150,8 @@
 
 
           function drawMap(map, players) {
+            var label = [];
+
             clear();
             $.each(map, function(outKey, outValue) {
               $.each(outValue, function(inKey, inValue) {
@@ -171,12 +174,17 @@
                 $.each(players, function(k, v) {
                   if(v.X === inKey && v.Y === outKey) {
                     ctx.drawImage(player, inKey*_fw+_pw/2, outKey*_fh+_ph/2, _pw, _ph);
-                    /*ctx.fillText(v.id, inKey*_fw+_pw/2+50, outKey*_fh+_ph/2);
-                    ctx.font = "bold 16px Arial";*/
+                    label.push({name: v.id, X: inKey*_fw+_pw/2+50, Y: outKey*_fh+_ph/2});
                   }
                 });
               });
             });
+
+            $.each(label, function(key, value) {
+              ctx.font="20px Georgia";
+              ctx.fillStyle = 'white';
+              ctx.fillText(value.name, value.X, value.Y);
+            })
           }// draw Map
 
           function clear() {
