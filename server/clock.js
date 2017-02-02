@@ -1,3 +1,6 @@
+/*
+  Copyright © 2017 [Biren Gil]
+*/
 const _ = require('lodash');
 
 module.exports = {
@@ -104,7 +107,7 @@ module.exports = {
             force: 3, //Bomb power
             explodeSpeed: 2000, //time until explosion
             explosionDuration: 200, //explosion duration
-            limitBomb: 2, // Bomb limit user
+            limitBomb: 5, // Bomb limit user
             kills: 0, // default 0 kills
             isConnected: true
         };

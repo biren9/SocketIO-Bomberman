@@ -1,4 +1,6 @@
-// Require HTTP module (to start server) and Socket.IO
+/*
+  Copyright © 2017 [Biren Gil]
+*/
 const path = require('path');
 const express = require('express');
 const http = require('http');
