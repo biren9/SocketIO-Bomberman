@@ -176,7 +176,7 @@
                 $.each(players, function(k, v) {
                   if(v.X === inKey && v.Y === outKey) {
                     ctx.drawImage(player, inKey*_fw+_pw/2, outKey*_fh+_ph/2, _pw, _ph);
-                    label.push({name: v.id, X: inKey*_fw+_pw/2+50, Y: outKey*_fh+_ph/2});
+                    label.push({name: v.username, X: inKey*_fw+_pw/2+50, Y: outKey*_fh+_ph/2});
                   }
                 });
               });

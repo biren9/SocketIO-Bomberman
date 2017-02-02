@@ -46,7 +46,8 @@ module.exports = {
             for (p in self.players) {
               if (self.players[p].isConnected) {
                     pl.push({
-                        id: self.players[p].username,
+                        id: self.players[p].id,
+                        username: self.players[p].username,
                         kills: self.players[p].kills,
                         X: self.players[p].X,
                         Y: self.players[p].Y
