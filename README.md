@@ -15,6 +15,7 @@ _Open_ **http://localhost:8080** _in a webbrowser_
  + Add a server clock to synchronise calculations
  + Synchronise explosions
  + Better bombs
+ + Every player has a username
 
 ### TODO ###
 1. Now I have to test **everything** again
