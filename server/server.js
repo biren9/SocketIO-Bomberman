@@ -48,7 +48,7 @@ socket.on('connection', function(client) {
 
     client.on('disconnect', function() {
         console.log('Client ready for disconnect');
-        gameClock.scheudleDisconnect(gameClock.players[client.id]); // Player ready for disconnect
+        gameClock.scheudleDisconnect(client.id); // Player ready for disconnect
     });
 });
 

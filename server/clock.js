@@ -4,7 +4,7 @@ module.exports = {
     speed: 100,
     timer: null,
     queue: [],
-    players: [],
+    players: {},
     socket: null,
     map: [
         [0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 1, 0, 0, 0, 1, 1, 0, 0, 0, 1],
@@ -44,21 +44,23 @@ module.exports = {
 
             //Create an return array with every connected player
             for (p in self.players) {
-                //console.log(self.players[p].id);
-                if (self.players[p].isConnected) {
+              if (self.players[p].isConnected) {
                     pl.push({
                         id: self.players[p].id,
                         kills: self.players[p].kills,
                         X: self.players[p].X,
                         Y: self.players[p].Y
                     });
-                } // Delete player who is disconnected
-                else {
-                    console.log("Client disconnected " + self.players[p].id);
-                    self.players.splice(self.players[p].id, 1);
+              } // Delete player who is disconnected
+              else {
+                if(self.players[p].bombs.length <= 0) {
+                  console.log(self.players[p]);
+                  delete self.players[p];
                 }
+              }
             }
-            //Return Object with new map
+
+            //Return Object with new map & players
             self.socket.send({
                 map: self.map,
                 players: pl
@@ -100,17 +102,18 @@ module.exports = {
             force: 3, //Bomb power
             explodeSpeed: 2000, //time until explosion
             explosionDuration: 200, //explosion duration
-            kills: 0,
+            kills: 0, // default 0 kills
             isConnected: true
-        }; // default 0 kills
+        };
     },
 
 
 
-    scheudleDisconnect: function(c) {
-        c.isConnected = false;
-        c.X = -1;
-        c.Y = -1;
+    scheudleDisconnect: function(id) {
+        if(this.players[id] === undefined) return;
+        this.players[id].isConnected = false;
+        this.players[id].X = -1;
+        this.players[id].Y = -1;
     }
 };
 
@@ -220,9 +223,10 @@ var renderMap = {
                 }
             } else {
                 self.map[b[i].Y][b[i].X] = 0; // Remove explosion
+
                 for (let bf in b[i].bombField) {
 
-                    self.map[b[i].bombField[bf].Y][b[i].bombField[bf].X] = 0;
+                    self.map[b[i].bombField[bf].Y][b[i].bombField[bf].X] = 0; // Remove explosion
                     for (let p in self.players) {
 
                         //Compare players and explosion position
