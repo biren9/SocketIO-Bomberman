@@ -8,6 +8,16 @@ _Run cli:_ **node server.js**
 #### Client ####
 _Open_ **http://localhost:8080** _in a webbrowser_
 
+#### How to Play ####
+Action | Keyboard
+------------ | -------------
+**UP** | W
+**LEFT** | A
+**DOWN** | S
+**RIGHT** | D
+**Bomb** | B
+**Block** | V
+
 ### Demo ###
 [Demo](http://biren.eu:8080 "Demo")
 
