@@ -104,7 +104,7 @@ module.exports = {
             force: 3, //Bomb power
             explodeSpeed: 2000, //time until explosion
             explosionDuration: 200, //explosion duration
-            limitBomb: 2,
+            limitBomb: 2, // Bomb limit user
             kills: 0, // default 0 kills
             isConnected: true
         };
@@ -142,14 +142,14 @@ var renderMap = {
 
                         if(self.players[client.id].limitBomb >= self.players[client.id].bombs.length) {
                           self.players[client.id].bombs.push({
-                              X: nX,
-                              Y: nY,
-                              isPlaced: false,
-                              isExplode: false,
-                              explodeTime: ms + self.players[client.id].explodeSpeed,
-                              force: self.players[client.id].force,
-                              explosionDuration: self.players[client.id].explosionDuration,
-                              bombField: []
+                              X: nX, // Bomb X coordinates
+                              Y: nY, // Bomb y coordinates
+                              isPlaced: false, // is bomb already on map
+                              isExplode: false, // is bomb alreaey explode
+                              explodeTime: ms + self.players[client.id].explodeSpeed, // exact explode time
+                              force: self.players[client.id].force, // explosion force
+                              explosionDuration: self.players[client.id].explosionDuration, // explosion duration
+                              bombField: [] // explosion location
                           });
                         }
                     } else if (event.W === 1) { //Prevent placing blocks -> top left corner
@@ -161,7 +161,7 @@ var renderMap = {
         }
     },
     bomeInteraction: function(client, self) {
-        var b = self.players[client.id].bombs;
+        var b = self.players[client.id].bombs; // shortcut for bomb array
 
         for (var i = 0; i < b.length; i++) {
 
@@ -172,7 +172,7 @@ var renderMap = {
                 }
             } else if ((b[i].explodeTime + b[i].explosionDuration) >= Date.now()) { //Explosion
                 if (!b[i].isExplode) {
-                    b[i].isExplode = true;
+                    b[i].isExplode = true; // Set Explode to true
                     self.map[b[i].Y][b[i].X] = 4; //Replace bomb with an explosion
 
                     //Add Bomb location to explode radius
@@ -244,12 +244,12 @@ var renderMap = {
                             })) {
                             //Execute when position are equale
                             self.players[b[i].bombField[bf].id].kills += 1; // append a kill to the bomb owner
-                            self.addClient(self.players[p], self.players[p].bombs); //Recalculate new coordinates
-                        }
-                    } //for let p in players
-                } //for let bf in bombField
+                            self.addClient(self.players[p], self.players[p].bombs); // Recalculate new coordinates
+                        }// if
+                    } // for let p in players
+                } // for let bf in bombField
                 self.players[client.id].bombs.splice(i, 1);
-            }
-        }
-    }
+            } // else
+        } // for
+    } // bomeInteraction function
 };
