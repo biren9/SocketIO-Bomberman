@@ -8,6 +8,17 @@ const _ = require('lodash');
 const maxPlayers = 60;
 var gameClock = require('./clock.js');
 
+String.prototype.trunc = function(n) {
+  var ret = this.substr(0, n - 1);
+  if(this.length === 0) {
+    return null;
+  }
+  else if(this.length > n) {
+    return ret + "...";
+  }
+  else return ret;
+};
+
 
 var app = express();
 const publicDir = path.join(__dirname, '../client');
@@ -28,6 +39,7 @@ gameClock.start();
 
 // Add a connect listener
 socket.on('connection', function(client) {
+    client.username = client.handshake.query.username.trunc(15);
     if (_.size(gameClock.players) >= maxPlayers) {
         client.send({
             status: "full"

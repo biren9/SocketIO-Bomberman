@@ -46,7 +46,7 @@ module.exports = {
             for (p in self.players) {
               if (self.players[p].isConnected) {
                     pl.push({
-                        id: self.players[p].id,
+                        id: self.players[p].username,
                         kills: self.players[p].kills,
                         X: self.players[p].X,
                         Y: self.players[p].Y
@@ -54,7 +54,7 @@ module.exports = {
               } // Delete player who is disconnected
               else {
                 if(self.players[p].bombs.length <= 0) {
-                  console.log(self.players[p]);
+                  console.log("Remove "+p);
                   delete self.players[p];
                 }
               }
@@ -96,6 +96,7 @@ module.exports = {
         let rand = Math.floor(Math.random() * freePlace.length);
         this.players[c.id] = {
             id: c.id, //Client id
+            username: c.username,
             X: freePlace[rand].X, //spot on map
             Y: freePlace[rand].Y, //spot on map
             bombs: bombLeftOnField, //Bombs on field

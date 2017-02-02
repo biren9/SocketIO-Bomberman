@@ -47,7 +47,9 @@
           var host = window.location.hostname;
           var port = window.location.port;
 
-          var socket = new io.connect('http://'+host+':'+port);
+          var username = prompt("Please Enter a Username:")
+
+          var socket = new io.connect('http://'+host+':'+port, {query: "username="+username});
           var floor = new Image();
               floor.src = "textures/floor.jpg";
           var wall = new Image();
