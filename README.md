@@ -23,4 +23,4 @@ _Open_ **http://localhost:8080** _in a webbrowser_
 3. Put the timer down if nobody is connected
 4. As always, **IMPROVEMENTS** :-)
 
-![demo](https://cloud.githubusercontent.com/assets/11445459/22523219/d5e60a04-e8be-11e6-8d3d-1514a69f7778.png)
+![screen shot 2017-02-02 at 21 07 14](https://cloud.githubusercontent.com/assets/11445459/22566326/c115cbdc-e98b-11e6-8648-b0b6535ef787.png)
