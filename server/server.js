@@ -37,10 +37,10 @@ var socket = io.listen(server);
 //define game logic specifictions
 gameClock.socket = socket;
 gameClock.speed = 50; // default = 100
-gameClock.start();
 
 // Add a connect listener
 socket.on('connection', function(client) {
+    gameClock.start();
     client.username = client.handshake.query.username.trunc(15);
     if (_.size(gameClock.players) >= maxPlayers) {
         client.send({

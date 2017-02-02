@@ -30,8 +30,10 @@ module.exports = {
         if (this.timer !== null) return; // prevent starting timer multiple times
         var self = this; // reference for this
 
-        this.timer = setInterval(function() {
+        this.timer = setInterval(function() { console.log("Timer :) " + _.size(self.players));
             var element;
+
+            if(_.size(self.players) === 0) self.stop();
 
             //Render Map for every action in Queue
             while ((element = self.queue.shift()) !== undefined) {
@@ -77,9 +79,8 @@ module.exports = {
 
     stop: function() {
         // Clear Timer & cleanup
-        clearInterval(timer);
-        self = null;
-        timer = null;
+        clearInterval(this.timer);
+        this.timer = null;
     },
 
 
