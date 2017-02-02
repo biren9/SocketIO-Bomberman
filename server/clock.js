@@ -102,7 +102,7 @@ module.exports = {
             Y: freePlace[rand].Y, //spot on map
             bombs: bombLeftOnField, //Bombs on field
             force: 3, //Bomb power
-            explodeSpeed: 5000, //time until explosion
+            explodeSpeed: 2000, //time until explosion
             explosionDuration: 200, //explosion duration
             limitBomb: 2, // Bomb limit user
             kills: 0, // default 0 kills
