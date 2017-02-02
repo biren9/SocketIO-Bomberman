@@ -140,7 +140,7 @@ var renderMap = {
                     if (event.B === 1) { //event.B = Bomb
                         let ms = Date.now(); // timestamp
 
-                        if(self.players[client.id].limitBomb >= self.players[client.id].bombs.length) {
+                        if(self.players[client.id].limitBomb > self.players[client.id].bombs.length) {
                           self.players[client.id].bombs.push({
                               X: nX, // Bomb X coordinates
                               Y: nY, // Bomb y coordinates
