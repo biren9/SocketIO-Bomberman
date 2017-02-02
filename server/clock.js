@@ -104,6 +104,7 @@ module.exports = {
             force: 3, //Bomb power
             explodeSpeed: 2000, //time until explosion
             explosionDuration: 200, //explosion duration
+            limitBomb: 2,
             kills: 0, // default 0 kills
             isConnected: true
         };
@@ -139,16 +140,18 @@ var renderMap = {
                     if (event.B === 1) { //event.B = Bomb
                         let ms = Date.now(); // timestamp
 
-                        self.players[client.id].bombs.push({
-                            X: nX,
-                            Y: nY,
-                            isPlaced: false,
-                            isExplode: false,
-                            explodeTime: ms + self.players[client.id].explodeSpeed,
-                            force: self.players[client.id].force,
-                            explosionDuration: self.players[client.id].explosionDuration,
-                            bombField: []
-                        });
+                        if(self.players[client.id].limitBomb >= self.players[client.id].bombs.length) {
+                          self.players[client.id].bombs.push({
+                              X: nX,
+                              Y: nY,
+                              isPlaced: false,
+                              isExplode: false,
+                              explodeTime: ms + self.players[client.id].explodeSpeed,
+                              force: self.players[client.id].force,
+                              explosionDuration: self.players[client.id].explosionDuration,
+                              bombField: []
+                          });
+                        }
                     } else if (event.W === 1) { //Prevent placing blocks -> top left corner
                         if (nY > 1 || nX > 1) self.map[nY][nX] = 2; // Guaranteed find a spawn spot
                     }
