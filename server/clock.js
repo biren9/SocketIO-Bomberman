@@ -76,6 +76,7 @@ module.exports = {
 
 
     stop: function() {
+        // Clear Timer & cleanup
         clearInterval(timer);
         self = null;
         timer = null;
@@ -93,33 +94,33 @@ module.exports = {
                     X: j,
                     Y: i
                 });
-            }
-        }
+            } // for
+        } // for
 
         //Select a random place on the map
         let rand = Math.floor(Math.random() * freePlace.length);
         this.players[c.id] = {
             id: c.id, //Client id
-            username: c.username,
-            X: freePlace[rand].X, //spot on map
-            Y: freePlace[rand].Y, //spot on map
-            bombs: bombLeftOnField, //Bombs on field
-            force: 3, //Bomb power
-            explodeSpeed: 2000, //time until explosion
-            explosionDuration: 200, //explosion duration
+            username: c.username, // Set username
+            X: freePlace[rand].X, // spot on map
+            Y: freePlace[rand].Y, // spot on map
+            bombs: bombLeftOnField, // Bombs on field
+            force: 3, // Bomb power
+            explodeSpeed: 2000, // time until explosion
+            explosionDuration: 200, // explosion duration
             limitBomb: 5, // Bomb limit user
             kills: 0, // default 0 kills
-            isConnected: true
+            isConnected: true // ready to disconnect
         };
     },
 
 
 
     scheudleDisconnect: function(id) {
-        if(this.players[id] === undefined) return;
-        this.players[id].isConnected = false;
-        this.players[id].X = -1;
-        this.players[id].Y = -1;
+        if(this.players[id] === undefined) return; // prevent undefined
+        this.players[id].isConnected = false; // ready to disconnect
+        this.players[id].X = -1; // hide from map
+        this.players[id].Y = -1; // not sure if necessary
     }
 };
 
@@ -154,26 +155,25 @@ var renderMap = {
                               explosionDuration: self.players[client.id].explosionDuration, // explosion duration
                               bombField: [] // explosion location
                           });
-                        }
-                    } else if (event.W === 1) { //Prevent placing blocks -> top left corner
+                        } // if
+                    } else if (event.W === 1) { // Prevent placing blocks -> top left corner
                         if (nY > 1 || nX > 1) self.map[nY][nX] = 2; // Guaranteed find a spawn spot
-                    }
-
-                }
-            }
-        }
-    },
+                    } // else if
+                } // if
+            } // if
+        } // if
+    }, // function PlayerInteraction
     bomeInteraction: function(client, self) {
         var explodeTo = function(X, Y) {
           let p, b;
-          for(p in self.players) {
-            for(b in self.players[p].bombs) {
-              if(self.players[p].bombs[b].X === X && self.players[p].bombs[b].Y === Y) {
-                self.players[p].bombs[b].explodeTime = Date.now();
-              }
-            }
-          }
-        };
+          for(p in self.players) { // iterate players
+            for(b in self.players[p].bombs) { // iterate player bombs
+              if(self.players[p].bombs[b].X === X && self.players[p].bombs[b].Y === Y) { // Explosion hit an other bomb
+                self.players[p].bombs[b].explodeTime = Date.now(); // Set Explosion time to now
+              } // if
+            } // for
+          } // for
+        }; // function explodeTo
 
         var b = self.players[client.id].bombs; // shortcut for bomb array
 
@@ -196,14 +196,16 @@ var renderMap = {
                         id: client.id
                     });
 
+                    // Set to false when hit a block
                     let up = true;
                     let down = true;
                     let left = true;
                     let right = true;
 
+                    // For every Bomb
                     for (let j = 1; j <= b[i].force; j++) {
-                        if (up && b[i].Y - j >= 0 && self.map[b[i].Y - j][b[i].X] !== 1) {
-                            if (self.map[b[i].Y - j][b[i].X] === 2) up = false;
+                        if (up && b[i].Y - j >= 0 && self.map[b[i].Y - j][b[i].X] !== 1) { // No wall
+                            if (self.map[b[i].Y - j][b[i].X] === 2) up = false; // Block ->
                             if (self.map[b[i].Y - j][b[i].X] === 3) explodeTo(b[i].X, b[i].Y - j);
                             self.map[b[i].Y - j][b[i].X] = 4;
                             b[i].bombField.push({
