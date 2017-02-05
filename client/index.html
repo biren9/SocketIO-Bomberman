@@ -173,9 +173,11 @@
                   a = bomb;
                 }
                 else if(inValue === 4) {
+                  ctx.globalAlpha = 0.85;
                   a = explode;
                 }
                 ctx.drawImage(a, inKey*_fw, outKey*_fh, _fw, _fh);
+                ctx.globalAlpha = 1;
                 $.each(players, function(k, v) {
                   if(v.X === inKey && v.Y === outKey) {
                     ctx.drawImage(player, inKey*_fw+_pw/2, outKey*_fh+_ph/2, _pw, _ph);
